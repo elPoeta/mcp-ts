@@ -1,0 +1,10 @@
+{
+	"mcpServers": {
+		"mcp-ts": {
+			"command": "node",
+			"args": [
+				"/home/elpoeta/workspaces/ai/node/mcp-servers/mcp-ts/build/index.js"
+			]
+		}
+	}
+}

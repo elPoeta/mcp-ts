@@ -1,29 +1,63 @@
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
-  McpServer,
-  ResourceTemplate,
-} from "@modelcontextprotocol/sdk/server/mcp.js"
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
-import { CreateMessageResultSchema } from "@modelcontextprotocol/sdk/types.js"
-import { z } from "zod3"
+	CallToolRequestSchema,
+	ErrorCode,
+	ListToolsRequestSchema,
+	McpError,
+} from "@modelcontextprotocol/sdk/types.js";
+import { type Tool, ListToolsDefReqSchema } from './schema.js'
 
-const server = new McpServer({
-  name: "start-mcp",
-  version: "1.0.0",
-  capabilities: {
-    resources: {},
-    tools: {},
-    prompts: {},
-  },
-})
+const server = new Server({
+	name: "mcp-server",
+	version: "1.0.0",
+}, {
+	capabilities: {
+		tools: {}
+	}
+});
 
+const exampleDefTool: Tool = {
+	name: "example",
+	description: "Example Tool desc.",
+	inputSchema: {
+		type: "object",
+		properties: {
+			a: { type: "number" },
+			b: { type: "number" }
+		},
+		required: ["a", "b"]
+	}
+}
 
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+	const tools: Tool[] = [exampleDefTool];
+
+	return ListToolsDefReqSchema.parse({ tools })
+
+});
+
+server.setRequestHandler(CallToolRequestSchema, async (request) => {
+	const { name, arguments: args } = request.params;
+	switch (name) {
+		case "example":
+			const { a, b } = args as any;
+			return { content: [{ type: "text", text: JSON.stringify(a + b) }] };
+		default:
+			throw new McpError(ErrorCode.MethodNotFound, "Tool not found");
+	}
+});
 
 
 
 async function main() {
-  const transport = new StdioServerTransport()
-  await server.connect(transport)
+	const transport = new StdioServerTransport();
+	await server.connect(transport);
+	console.log("MCP server is running...");
 }
 
-main()
+main().catch((error) => {
+	console.error("Server error:", error);
+	process.exit(1);
+});
 
