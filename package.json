@@ -1,0 +1,34 @@
+{
+  "name": "mcp-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "starter": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "server:dev": "tsx src/index.ts",
+    "server:inspect": "set DANGEROUSLY_OMIT_AUTH=true && pnpm dlx @modelcontextprotocol/inspector pnpm run server:dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.14.0",
+  "dependencies": {
+    "@dotenvx/dotenvx": "^1.48.4",
+    "@modelcontextprotocol/sdk": "^1.17.1",
+    "zod3": "npm:zod@^3.25.76",
+    "zod4": "npm:zod@^4.0.15"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.16.2",
+    "@types/node": "^24.2.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2"
+  }
+}
